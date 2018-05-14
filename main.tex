@@ -144,7 +144,8 @@ MOOC(Massive Open Online Course)即“大规模在线开放课程”，具有大
 因此可以说在MOOC流行之前，国内对于在线学习的建设已有一定的基础。2012年MOOC风暴掀起之后，国内诸多高校纷纷跟进。北京大学、清华大学、上海交大、
 复旦大学等知名高校纷纷加入Courser和edX等MOOC平台。2013年，清华基于open-edX开源项目，研发了自主MOOC平台“学堂在线”，2014年上海交大自主
 研发的“好大学在线”平台也正式发布，并与西南片高校跨校合作，学分互认。同一年，深圳大学带头组建UOOC联盟，以联高校盟的形式推动MOOC建设，并与企
-业合作构建MOOC平台。高校之外，爱课程网和网易云课堂合作推出的“中国大学MOOC”，2012年组建的“上海课程中心”等，也汇聚了大量优质的在线课程资源。\par
+业合作构建MOOC平台。高校之外，爱课程网和网易云课堂合作推出的“中国大学MOOC”，2012年组建的“上海课程中心”等，也汇聚了大量优质的在线课程资源。
+\cite{mooc}\par
 \subsection{系统主要研究内容}
 \begin{itemize}
     \item 如何实现一套灵活的权限控制系统。
@@ -477,7 +478,7 @@ Ubuntu Linux Server 16.04 x64。\par
 \subsubsection{MySQL规范}
 根据工程实践经验，大型系统的性能瓶颈主要在数据库上，故在设计初应尽可能减小数据库的压力，按照具体业务分库分表，允许一定的字段冗余和反模式
 设计。结合MySQL 5.7的具体特性，数据库使用InnoDB引擎，不在数据库表中定义外键，其关联关系在应用层手动控制，为保证业务逻辑的完整性，禁用
-数据库存储过程和函数，将所有业务逻辑在应用层实现。\par
+数据库存储过程和函数，将所有业务逻辑在应用层实现。\cite{alibaba-java-coding-guidelines}\par
 数据表采用BIGINT类型(对应Java或Kotlin中Long类型)自增长主键，每张表中包含id、create\_time、creator、modify\_time、modifier、
 note、version字段。其中create\_time、creator、modify\_time、modifier由应用层框架在数据库时自动控制；note字段用于数据记录特殊
 备注标识；version字段用于乐观锁，由框架自动控制，不手动修改。\par
@@ -827,17 +828,18 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \caption{微服务内部架构图}
     \label{fig:arch-microserver}
 \end{figure}
-本系统选择了较为前沿的Spring Cloud分布式微服务技术架构。Spring Cloud是一个基于Spring Boot实现的微服务开发框架，它为基于JVM开发的云应用中的
+本系统选择了较为前沿的Spring Cloud分布式微服务技术架构。Spring Cloud是一个基于Spring Boot\cite{spring-boot}实现的微服务开发框架，它为基于JVM开发的云应用中的
 服务发现、断路器、微代理、配置管理、全局锁、智能路由、决策竞选、控制总线、集群状态管理和分布式会话等操作提供了一种简单的开发方式。\par
 Spring Cloud集合了众多的开源项目，限于时间和精力，本项目仅采用了其中部分的功能。\par
 \subsubsection{服务注册与发现}
 在分布式微服务技术架构中，各个微服务间的通信是首先需要解决的问题，如果每个微服务手工指定其他服务的通信地址，随着应用的增多，配置代价将迅速提升，并且
 当一个服务改变位置后，要重新配置依赖其的所有应用，可维护性极差。因此，这里使用微服务基于注册和发现的策略，所有微服务在启动后向服务注册中心注册，并从
-注册中心查找依赖的其他微服务地址，以达到服务自动发现的目的。\par
+注册中心查找依赖的其他微服务地址，以达到服务自动发现的目的\cite{service-discovery-in-a-microservices-architecture}。\par
 服务注册与发现的思想，与Spring框架本身的核心概念控制反转有异曲同工之处。控制反转是Spring最核心的概念之一，是指将类以Bean的形式注册到Spring容器，
 类之间协作只需声明依赖关系，不需要手工实例化，全权由Spring容器负责依赖注入和实例化装配，大大简化了Java EE的开发流程。从某种意义上来讲，服务注册与
 发现思想是对控制反转思想的延伸。\par
-在具体实现中，本系统用到了Spring Cloud Netflix模块中的Eureka模块。\par
+在具体实现中，本系统用到了Spring Cloud Netflix模块中的Eureka模块。Eureka是基于CAP理论\cite{cap}中的AP原则构建的，首先保证微服务的可用性，
+并在此基础上最大限度的保持微服务的一致性。\par
 \begin{figure}[H]
     \centering
     \includegraphics[width=130mm]{struct-eureka.png}
@@ -1028,10 +1030,10 @@ data class TokenDO(@Id val id: String = UUID.randomUUID().toString(),
 
 \subsection{权限控制实现}
 在传统的MVC应用中，由Servlet容器（如Tomcat）维持Session，其原理是在客户端浏览器上通过Cookie保持JSESSIONID，在与服务器通信时携带该信息，
-Servlet容器通过JSESSIONID区分Session，整个过程由Servlet容器自动管理。\par
+Servlet容器通过JSESSIONID区分Session，整个过程由Servlet容器自动管理。\cite{tomcat}\par
 RESTful风格是一种无状态的请求操作，本身并没有Session的概念，每次请求携带用于标识身份的token从服务器获取资源，因此需要通过手工实现类似
 Session的功能。\par
-本系统中，用户登录后服务器将生成一个UUID返回给请求者作为token，并将该token作为键、用户id作为值存入Redis缓存中，设定30分钟的过期时间。请求
+本系统中，用户登录后服务器将生成一个UUID\cite{uuid}返回给请求者作为token，并将该token作为键、用户id作为值存入Redis缓存中，设定30分钟的过期时间。请求
 者在每次请求是携带该token作为唯一身份标识。\par
 \subsubsection{工作流程}
 \begin{figure}[H]
@@ -1244,7 +1246,7 @@ Nginx服务负责文件下载，当请求文件下载时，Nginx服务器根据U
 脚本加工具链组合的方式，充分发挥各种脚本和工具链特长，协同完成自动化升级部署的任务。\par
 \paragraph{编译打包}
 使用Gradle自动化打包工具，通过gradle spring-boot插件中的task bootJar将微服务打包。特别的，通过配置插件属性，可以实现将服务打包
-成可在Unix-like平台下完全自启动（full executable）的程序包。\par
+成可在Unix-like平台下完全自启动（fully executable）\cite{fully-executable}的程序包。\par
 \paragraph{服务的启动和停止}
 本系统将每个微服务作为Linux系统中的守护进程运行，使用Linux系统组件中的systemd管理项目的启动和停止。自定义systemd启动脚本如下：
 \begin{mdframed}\begin{verbatim}
@@ -1496,18 +1498,26 @@ Gradle构建工具等。在使用新技术时，一方面通传统技术进行�
 设计提出了很多宝贵的修改意见，并严格督促毕业设计进度。\par
 我要感谢实习公司的领导和同事。一方面感谢领导在实习期间尽量少给我安排工作任务，并允许我在实习空余时间进行毕业设计；另一方面感谢许多同事在技术方面给我很多帮助，每次请教他们技术问题
 都会得到热情的回复和耐心的讲解。\par
-我要感谢全世界的开发者，感谢他们对这个行业所做的贡献，感谢他们的奉献精神，他们开发并开源了如此众多的优秀技术框架无偿供我们学习和使用，正是他们，驱动着整个信息技术产业的发展和进步。\par
+感谢全世界的开发者，感谢他们对这个行业所做的贡献，感谢他们的奉献精神，他们开发并开源了如此众多的优秀技术框架无偿供我们学习和使用，正是他们，驱动着整个信息技术产业的发展和进步。\par
 感谢学生时代陪我一路走过的同学、朋友们以及我的家人，学生时代，离不开这些和我最近的人。\par
 \clearpage
 
 \begin{thebibliography}{99}
     \bibitem{kotlin} Kotlin官方网站，\url{http://kotlinlang.org/}
     \bibitem{spring-cloud} Spring Cloud官方网站，\url{http://projects.spring.io/spring-cloud/}
-    \bibitem{gradle} Gradle官方网站，\url{https://gradle.org/}
+    \bibitem{gradle} Gradle in Action，Author Benjamin Muschko, Published by Manning Publications, 2014-3-9, ISBN: 9781617291302.
     \bibitem{vue} Vue.js官方网站，\url{https://cn.vuejs.org/}
     \bibitem{webpack} Webpack官方网站，\url{http://webpack.github.io/}
-    \bibitem{2017政府工作报告} 2017年政府工作报告，\url{http://www.gov.cn/premier/2017-03/16/content_5177940.htm}
-    \bibitem{第40次中国互联网络发展状况统计报告} 第40次中国互联网络发展状况统计报告，中央网络安全和信息化领导小组办公室、国家互联网信息办公室、中国信息网络互联中心，2017年8月
+    \bibitem{2017政府工作报告} 2017年政府工作报告，\url{http://www.gov.cn/premier/2017-03/16/content_5177940.htm}。
+    \bibitem{第40次中国互联网络发展状况统计报告} 第40次中国互联网络发展状况统计报告，中央网络安全和信息化领导小组办公室、国家互联网信息办公室、中国信息网络互联中心，2017年8月。
+    \bibitem{mooc} 慕课在我国的发展现状，张洪东，《中国教育信息化》杂志，2016-01-11。
     \bibitem{jetbrains} Jetbrains官方网站，\url{http://www.jetbrains.com/}
+    \bibitem{alibaba-java-coding-guidelines} 阿里巴巴Java开发手册，\url{https://github.com/alibaba/p3c}
+    \bibitem{spring-boot} Spring Boot in Action, Author Craig Walls, Published by Manning Publications, 2016-1-3, ISBN: 9781617292545.
+    \bibitem{service-discovery-in-a-microservices-architecture} Service Discovery in a Microservices Architecture，Chris Richardson of Eventuate, Inc. October 12, 2015.
+    \bibitem{cap} Gilbert S, Lynch N. Perspectives on the CAP Theorem[M]. IEEE Computer Society Press, 2012.
+    \bibitem{tomcat} Tomcat内核设计剖析，汪建著。人民邮电出版社，2017年06月。
+    \bibitem{uuid} Leach, Paul, and R. Salz. "UUIDs and GUIDs." (1998).
+    \bibitem{fully-executable} Service wrappers for spring boot application，\url{https://github.com/spring-projects/spring-boot/issues/519}
 \end{thebibliography}
 \end{document}
