@@ -271,7 +271,7 @@ Nginx用于部署前端应用，搭建文件服务器，以及作为网关为后
 % % todo
 % \subsubsection{1层图}
 % % todo
-% \clearpage
+\clearpage
 
 \section{概要设计}
 \subsection{总体设计}
@@ -513,6 +513,22 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
 \end{figure}
 
 \subsection{具体设计}
+依照数据库设计规范，每个表均包含id、create\_time、creator、modify\_time、modifier、note、version字段，其统一定义如表\ref{tab:table_common}，
+每张表字段定义部分不再重复叙述。\par
+\begin{longtable}{|p{10em}|p{6em}|p{15em}|}
+    \caption{公共字段表}\label{tab:table_common}       \\\hline
+    字段名         & 类型         & 说明                 \\\hline
+    \endfirsthead
+    \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
+    \endhead
+    id             & bigint(20)   & 主键                 \\\hline
+    creator        & varchar(255) & 创建人               \\\hline
+    create\_time   & datetime(6)  & 创建时间             \\\hline
+    modifier       & varchar(255) & 修改人               \\\hline
+    modified\_time & datetime(6)  & 修改时间             \\\hline
+    note           & text         & 备注                 \\\hline
+    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
+\end{longtable}\par
 \subsubsection{权限模块}
 \paragraph{用户表user}
 \subparagraph{实体图}
@@ -529,16 +545,9 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     name           & varchar(255) & 姓名                 \\\hline
     login\_name    & varchar(255) & 登录名               \\\hline
     password       & varchar(255) & 密码                 \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 
 \paragraph{角色表role}
@@ -556,15 +565,8 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     code           & varchar(255) & 编码                 \\\hline
     name           & varchar(255) & 名称                 \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 
 \paragraph{用户-角色关联表user\_role}
@@ -582,15 +584,8 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}                      \\\hline
     \endhead
-    id             & bigint(20)   & 主键                               \\\hline
     role\_id       & bigint(20)   & 关联role主键                       \\\hline
     user\_id       & bigint(20)   & 关联user主键                       \\\hline
-    creator        & varchar(255) & 创建人                             \\\hline
-    create\_time   & datetime(6)  & 创建时间                           \\\hline
-    modifier       & varchar(255) & 修改人                             \\\hline
-    modified\_time & datetime(6)  & 修改时间                           \\\hline
-    note           & text         & 备注                               \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁）               \\\hline
 \end{longtable}\par
 
 \paragraph{访问控制列表表acl}
@@ -608,19 +603,12 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}          \\\hline
     \endhead
-    id             & bigint(20)   & 主键                   \\\hline
     affirmative    & bit(1)       & 高级授权标志位         \\\hline
     anonymous      & bit(1)       & 允许匿名标志位         \\\hline
     permissions    & varchar(255) & 权限表详情（扩展保留） \\\hline
     priority       & int(11)      & 优先级（数值小优先）   \\\hline
     role\_ids      & varchar(255) & 关联role主键集合       \\\hline
     url            & text         & 匹配URL模板            \\\hline
-    creator        & varchar(255) & 创建人                 \\\hline
-    create\_time   & datetime(6)  & 创建时间               \\\hline
-    modifier       & varchar(255) & 修改人                 \\\hline
-    modified\_time & datetime(6)  & 修改时间               \\\hline
-    note           & text         & 备注                   \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁）   \\\hline
 \end{longtable}\par
 
 \subsubsection{课程资源与在线测试模块}
@@ -639,15 +627,8 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}          \\\hline
     \endhead
-    id             & bigint(20)   & 主键                   \\\hline
     name           & varchar(255) & 名称                   \\\hline
     description    & text         & 描述                   \\\hline
-    creator        & varchar(255) & 创建人                 \\\hline
-    create\_time   & datetime(6)  & 创建时间               \\\hline
-    modifier       & varchar(255) & 修改人                 \\\hline
-    modified\_time & datetime(6)  & 修改时间               \\\hline
-    note           & text         & 备注                   \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁）   \\\hline
 \end{longtable}\par
 
 \paragraph{卡片表card}
@@ -665,16 +646,9 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     name           & varchar(255) & 名称                 \\\hline
     file\_ids      & varchar(255) & 关联file主键集合     \\\hline
     content        & text         & 内容（markdown文本） \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 
 \paragraph{课程表course}
@@ -692,7 +666,6 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     name           & varchar(255) & 名称                 \\\hline
     description    & text         & 描述                 \\\hline
     card\_ids      & varchar(255) & 关联card主键集合     \\\hline
@@ -701,12 +674,6 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     teacher\_id    & bigint(20)   & 教师id               \\\hline
     teacher\_name  & varchar(255) & 教师姓名             \\\hline
     image\_url     & text         & 图片链接             \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 
 \paragraph{问题表question}
@@ -724,7 +691,6 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}          \\\hline
     \endhead
-    id             & bigint(20)    & 主键                  \\\hline
     course\_id     & bigint(20)    & 关联course主键        \\\hline
     course\_name   & varchar(255)  & 关联course名称        \\\hline
     teacher\_id    & bigint(20)    & 教师id                \\\hline
@@ -733,12 +699,6 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     anwser         & text          & 答案(markdown文本)    \\\hline
     score          & decimal(19,2) & 分值（难度）          \\\hline
     type           & varchar(255)  & 类型                  \\\hline
-    creator        & varchar(255)  & 创建人                \\\hline
-    create\_time   & datetime(6)   & 创建时间              \\\hline
-    modifier       & varchar(255)  & 修改人                \\\hline
-    modified\_time & datetime(6)   & 修改时间              \\\hline
-    note           & text          & 备注                  \\\hline
-    version        & bigint(20)    & 版本号（用于乐观锁）  \\\hline
 \end{longtable}\par
 
 \paragraph{考试表exam}
@@ -756,19 +716,12 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     name           & varchar(255) & 名称                 \\\hline
     description    & text         & 描述                 \\\hline
     course\_id     & bigint(20)   & 关联course主键       \\\hline
     course\_name   & varchar(255) & 关联course名称       \\\hline
     teacher\_id    & bigint(20)   & 教师id               \\\hline
     teacher\_name  & varchar(255) & 教师姓名             \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 
 \subsubsection{论坛模块}
@@ -787,15 +740,8 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     name           & varchar(255) & 名称                 \\\hline
     description    & text         & 描述                 \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 
 \paragraph{发言表discussion}
@@ -813,16 +759,9 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}              \\\hline
     \endhead
-    id             & bigint(20)   & 主键                       \\\hline
     topic\_id      & bigint(20)   & 关联topic主键              \\\hline
     reply\_id      & bigint(20)   & 回复discussion主键         \\\hline
     content        & mediumtext   & 内容（markdown文本）       \\\hline
-    creator        & varchar(255) & 创建人                     \\\hline
-    create\_time   & datetime(6)  & 创建时间                   \\\hline
-    modifier       & varchar(255) & 修改人                     \\\hline
-    modified\_time & datetime(6)  & 修改时间                   \\\hline
-    note           & text         & 备注                       \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁）       \\\hline
 \end{longtable}\par
 
 \paragraph{话题表topic}
@@ -840,19 +779,12 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}           \\\hline
     \endhead
-    id              & bigint(20)   & 主键                   \\\hline
     name            & varchar(255) & 标题                   \\\hline
     block\_id       & bigint(20)   & 关联block主键          \\\hline
     block\_name     & varchar(255) & 关联block名称          \\\hline
     content         & mediumtext   & 内容（markdown文本）   \\\hline
     discussion\_ids & varchar(255) & 关联discussion主键集合 \\\hline
     keywords        & varchar(255) & 关键词                 \\\hline
-    creator         & varchar(255) & 创建人                 \\\hline
-    create\_time    & datetime(6)  & 创建时间               \\\hline
-    modifier        & varchar(255) & 修改人                 \\\hline
-    modified\_time  & datetime(6)  & 修改时间               \\\hline
-    note            & text         & 备注                   \\\hline
-    version         & bigint(20)   & 版本号（用于乐观锁）   \\\hline
 \end{longtable}\par
 
 \subsubsection{文件模块}
@@ -871,16 +803,9 @@ Redis中所有数据均存储在内存中，存储空间有限，存储代价较
     \endfirsthead
     \multicolumn{3}{r}{{续\tablename\thetable{}}}        \\\hline
     \endhead
-    id             & bigint(20)   & 主键                 \\\hline
     name           & varchar(255) & 文件名               \\\hline
     type           & varchar(255) & 文件类型             \\\hline
     url            & text         & 文件下载链接         \\\hline
-    creator        & varchar(255) & 创建人               \\\hline
-    create\_time   & datetime(6)  & 创建时间             \\\hline
-    modifier       & varchar(255) & 修改人               \\\hline
-    modified\_time & datetime(6)  & 修改时间             \\\hline
-    note           & text         & 备注                 \\\hline
-    version        & bigint(20)   & 版本号（用于乐观锁） \\\hline
 \end{longtable}\par
 \clearpage
 
